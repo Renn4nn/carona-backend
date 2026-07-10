@@ -8,7 +8,7 @@ export class UserRepository {
   constructor(
     @Inject('PrismaService')
     private readonly prisma: PrismaClient,
-  ) { }
+  ) {}
 
   user(where: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUniqueOrThrow({

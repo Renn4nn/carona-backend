@@ -21,15 +21,15 @@ async function bootstrap() {
   // CORS
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')
     ? configService
-      .get<string>('ALLOWED_ORIGINS')!
-      .split(',')
-      .map((o) => o.trim())
+        .get<string>('ALLOWED_ORIGINS')!
+        .split(',')
+        .map((o) => o.trim())
     : [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://localhost:3000',
-      'https://localhost:3001',
-    ];
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://localhost:3000',
+        'https://localhost:3001',
+      ];
 
   app.enableCors({
     origin: (
