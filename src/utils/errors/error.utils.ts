@@ -24,8 +24,8 @@ export function createApiResponseErrorFromZodFlattenError(
   const error: ApiErrorResponse =
     mappedErrors.length > 1
       ? {
-        errors: mappedErrors,
-      }
+          errors: mappedErrors,
+        }
       : { error: mappedErrors[0] };
 
   return error;

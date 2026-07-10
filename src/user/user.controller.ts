@@ -21,7 +21,7 @@ export class UserController {
   constructor(
     private readonly service: UserService,
     // private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   @Get()
   async getUsers(): Promise<ApiSuccessResponse<UserSchema[]>> {
