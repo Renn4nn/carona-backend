@@ -1,35 +1,43 @@
-name: Lint & Check Types
+name: CI
 
 on:
   push:
     branches:
       - main
       - develop
-
   pull_request:
     branches:
       - main
       - develop
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint-and-typecheck:
+  quality:
+    name: Quality checks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - name: 📦 Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🛠️ Setup Dependencies
+      - name: Setup dependencies
         uses: ./.github/actions/setup
 
-      - name: ◭ Generate Prisma Client
-        run: pnpm prisma generate
+      - name: Generate Prisma Client
+        run: pnpm exec prisma generate
 
-      - name: 🧹 Run Lint
-        run: pnpm lint:fix
+      - name: Lint
+        run: pnpm lint
 
-      - name: 🔍 Run Check Types
+      - name: Check types
         run: pnpm check-types
 
-      - name: ✨ Done!
-        run: echo "Code quality checks complete."
+      - name: Build
+        run: pnpm build
