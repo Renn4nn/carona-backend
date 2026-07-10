@@ -1,14 +1,14 @@
-import { DynamicModule, Module, Global } from '@nestjs/common'
-import { PrismaClient } from '../../../generated/prisma/client'
+import { DynamicModule, Module, Global } from '@nestjs/common';
+import { PrismaClient } from '../../../generated/prisma/client';
 
 @Global()
 @Module({})
 export class CustomPrismaModule {
   static forRootAsync(options: {
-    name: string
-    useFactory: (...args: any[]) => Promise<PrismaClient> | PrismaClient
-    inject?: any[]
-    isGlobal?: boolean
+    name: string;
+    useFactory: (...args: any[]) => Promise<PrismaClient> | PrismaClient;
+    inject?: any[];
+    isGlobal?: boolean;
   }): DynamicModule {
     return {
       module: CustomPrismaModule,
@@ -21,6 +21,6 @@ export class CustomPrismaModule {
         },
       ],
       exports: [options.name],
-    }
+    };
   }
 }

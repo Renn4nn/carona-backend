@@ -1,11 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { UpdateUserDto, CreateUserDto, UserSchema } from "src/utils/schemas/user.schema";
-import { UserRepository } from "./user.repository";
+import { Injectable } from '@nestjs/common';
+import {
+  UpdateUserDto,
+  CreateUserDto,
+  UserSchema,
+} from 'src/utils/schemas/user.schema';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   getUsers(): Promise<UserSchema[]> {
     return this.userRepository.users();

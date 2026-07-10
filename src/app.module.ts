@@ -5,12 +5,11 @@ import {
   ZodSerializationExceptionFilter,
   ZodValidationExceptionFilter,
   PrismaClientExceptionFilter,
-  HttpExceptionFilter
+  HttpExceptionFilter,
 } from './utils/filters';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomPrismaModule, PrismaClientFactory } from './utils/extensions';
 import { UserModule } from './user/user.module';
-
 
 @Module({
   imports: [
@@ -22,9 +21,9 @@ import { UserModule } from './user/user.module';
       name: 'PrismaService',
       isGlobal: true,
       useFactory: PrismaClientFactory,
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
-    UserModule
+    UserModule,
   ],
   providers: [
     {
@@ -54,4 +53,4 @@ import { UserModule } from './user/user.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

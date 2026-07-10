@@ -1,6 +1,6 @@
-import { Prisma } from "generated/prisma/client";
+import { Prisma } from 'generated/prisma/client';
 
-Prisma
+// Prisma;
 // User
 export const USER_SELECT: Prisma.UserSelect = {
   id: true,

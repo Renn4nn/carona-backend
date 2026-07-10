@@ -1,27 +1,28 @@
-import { Inject } from "@nestjs/common";
-import { PrismaClient } from "generated/prisma/client";
-import { Prisma } from "generated/prisma/client";
-import { USER_SELECT } from "src/utils/selects";
-import * as bcrypt from 'bcrypt'
-import { CreateUserDto, UpdateUserDto } from "src/utils/schemas/user.schema";
+import { Inject } from '@nestjs/common';
+import { PrismaClient } from 'generated/prisma/client';
+import { Prisma } from 'generated/prisma/client';
+import { USER_SELECT } from 'src/utils/selects';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto, UpdateUserDto } from 'src/utils/schemas/user.schema';
 
 export class UserRepository {
   constructor(
     @Inject('PrismaService')
-    private readonly prisma: PrismaClient) { }
+    private readonly prisma: PrismaClient,
+  ) {}
 
   user(where: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUniqueOrThrow({
       where,
-      select: USER_SELECT
-    })
+      select: USER_SELECT,
+    });
   }
 
   users() {
     return this.prisma.user.findMany({
       orderBy: { createdAt: 'asc' },
-      select: USER_SELECT
-    })
+      select: USER_SELECT,
+    });
   }
 
   async createUser(params: CreateUserDto) {
@@ -30,17 +31,17 @@ export class UserRepository {
     return this.prisma.user.create({
       data: {
         ...params,
-        password: hashPassword
+        password: hashPassword,
       },
-      select: USER_SELECT
-    })
+      select: USER_SELECT,
+    });
   }
 
   deleteUser(id: string) {
     return this.prisma.user.delete({
       where: { id },
-      select: USER_SELECT
-    })
+      select: USER_SELECT,
+    });
   }
 
   async updateUser(id: string, data: UpdateUserDto) {
@@ -52,7 +53,7 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { id },
       data: data,
-      select: USER_SELECT
+      select: USER_SELECT,
     });
   }
 }

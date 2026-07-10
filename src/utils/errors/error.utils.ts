@@ -1,32 +1,32 @@
-import { ApiError, ApiErrorResponse } from "../types/api"
-import { ZodError, z } from "zod"
+import { ApiError, ApiErrorResponse } from '../types/api';
+import { ZodError, z } from 'zod';
 
 export function createApiResponseErrorFromZodFlattenError(
-	err: ZodError
+  err: ZodError,
 ): ApiErrorResponse {
-	const type = 'ValidationException' as const
-	const fErr = z.flattenError(err)
+  const type = 'ValidationException' as const;
+  const fErr = z.flattenError(err);
 
-	const generateApiError = (message: string, details?: string): ApiError => {
-		return { type, message, details } as ApiError
-	}
+  const generateApiError = (message: string, details?: string): ApiError => {
+    return { type, message, details } as ApiError;
+  };
 
-	const formErrors = fErr.formErrors.map((e) =>
-		generateApiError(e, 'FormError')
-	)
+  const formErrors = fErr.formErrors.map((e) =>
+    generateApiError(e, 'FormError'),
+  );
 
-	const fieldErrors = Object.entries(fErr.fieldErrors).flatMap(([f, arr]) =>
-		(arr as string[]).map((e) => generateApiError(e, `FieldError em ${f}`))
-	)
+  const fieldErrors = Object.entries(fErr.fieldErrors).flatMap(([f, arr]) =>
+    (arr as string[]).map((e) => generateApiError(e, `FieldError em ${f}`)),
+  );
 
-	const mappedErrors = [...formErrors, ...fieldErrors]
+  const mappedErrors = [...formErrors, ...fieldErrors];
 
-	const error: ApiErrorResponse =
-		mappedErrors.length > 1
-			? {
-				errors: mappedErrors
-			}
-			: { error: mappedErrors[0] }
+  const error: ApiErrorResponse =
+    mappedErrors.length > 1
+      ? {
+          errors: mappedErrors,
+        }
+      : { error: mappedErrors[0] };
 
-	return error
+  return error;
 }
