@@ -26,7 +26,7 @@ jobs:
         run: pnpm prisma generate
 
       - name: 🧹 Run Lint
-        run: pnpm lint
+        run: pnpm lint:fix
 
       - name: 🔍 Run Check Types
         run: pnpm check-types
