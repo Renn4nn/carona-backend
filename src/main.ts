@@ -1,8 +1,83 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  // Cria a aplicação
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Config
+  const configService = app.get(ConfigService);
+
+  // Proxy
+  app.set('trust proxy', 1);
+
+  // Prefixo global
+  app.setGlobalPrefix('api');
+
+  // CORS
+  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')
+    ? configService
+      .get<string>('ALLOWED_ORIGINS')!
+      .split(',')
+      .map((o) => o.trim())
+    : [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://localhost:3030',
+      'http://localhost:3031',
+      'http://localhost:8080',
+      'http://localhost:5173',
+      'http://10.0.2.46',
+      'https://10.0.2.46',
+      'http://200.233.108.3',
+      'https://200.233.108.3',
+    ];
+
+  app.enableCors({
+    origin: (
+      origin: string | undefined,
+      callback: (error: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  // Swagger
+  const isNotProduction =
+    configService.get<string>('NODE_ENV') !== 'production';
+  if (isNotProduction) {
+    const config = new DocumentBuilder()
+      .setTitle('Carona Universitária')
+      .setDescription('API da Carona Universitária by Alisson e Renan')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const openApiDoc = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, cleanupOpenApiDoc(openApiDoc), {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+    console.log('Swagger UI is enabled (Development Mode)');
+  }
+
+  // Porta
+  const PORT = configService.get<number>('PORT') ?? 3000;
+
+  // Inicia o servidor (apenas uma vez)
+  await app.listen(PORT);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 }
+
 void bootstrap();
