@@ -21,22 +21,22 @@ async function bootstrap() {
   // CORS
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')
     ? configService
-        .get<string>('ALLOWED_ORIGINS')!
-        .split(',')
-        .map((o) => o.trim())
+      .get<string>('ALLOWED_ORIGINS')!
+      .split(',')
+      .map((o) => o.trim())
     : [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://localhost:3002',
-        'http://localhost:3030',
-        'http://localhost:3031',
-        'http://localhost:8080',
-        'http://localhost:5173',
-        'http://10.0.2.46',
-        'https://10.0.2.46',
-        'http://200.233.108.3',
-        'https://200.233.108.3',
-      ];
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://localhost:3030',
+      'http://localhost:3031',
+      'http://localhost:8080',
+      'http://localhost:5173',
+      'http://10.0.2.46',
+      'https://10.0.2.46',
+      'http://200.233.108.3',
+      'https://200.233.108.3',
+    ];
 
   app.enableCors({
     origin: (
@@ -77,7 +77,7 @@ async function bootstrap() {
 
   // Inicia o servidor (apenas uma vez)
   await app.listen(PORT);
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT} 🚀`);
 }
 
 void bootstrap();

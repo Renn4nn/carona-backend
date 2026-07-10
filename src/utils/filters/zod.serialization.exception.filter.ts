@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { ZodSerializationException } from 'nestjs-zod';
 import { ZodError, z } from 'zod';
-import { ApiErrorResponse } from '../types/api';
+import { ApiErrorResponse } from '../types/api/api';
 import { Response } from 'express';
 
 @Catch(ZodSerializationException)

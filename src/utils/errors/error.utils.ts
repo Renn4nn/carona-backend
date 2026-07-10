@@ -1,4 +1,4 @@
-import { ApiError, ApiErrorResponse } from '../types/api';
+import { ApiError, ApiErrorResponse } from '../types/api/api';
 import { ZodError, z } from 'zod';
 
 export function createApiResponseErrorFromZodFlattenError(
@@ -24,8 +24,8 @@ export function createApiResponseErrorFromZodFlattenError(
   const error: ApiErrorResponse =
     mappedErrors.length > 1
       ? {
-          errors: mappedErrors,
-        }
+        errors: mappedErrors,
+      }
       : { error: mappedErrors[0] };
 
   return error;

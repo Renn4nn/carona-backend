@@ -9,7 +9,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiSuccessResponse } from 'src/utils/types/api';
+import { ApiSuccessResponse } from 'src/utils/types/api/api';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -21,7 +21,7 @@ export class UserController {
   constructor(
     private readonly service: UserService,
     // private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   @Get()
   async getUsers(): Promise<ApiSuccessResponse<UserSchema[]>> {

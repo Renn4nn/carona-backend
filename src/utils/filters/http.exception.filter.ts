@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
-import { ApiErrorResponse } from '../types/api';
+import { ApiErrorResponse } from '../types/api/api';
 import { ZodSerializationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 import { Response } from 'express';
@@ -30,7 +30,7 @@ export class HttpExceptionFilter extends BaseExceptionFilter {
     const message =
       typeof exceptionResponse === 'object'
         ? (exceptionResponse as Record<'message', string>).message ||
-          exception.message
+        exception.message
         : exceptionResponse;
 
     const errorBody: ApiErrorResponse = {
@@ -40,7 +40,7 @@ export class HttpExceptionFilter extends BaseExceptionFilter {
         details: Array.isArray(message)
           ? message.join(', ')
           : (exceptionResponse as Record<'error', string>).error ||
-            'No additional details',
+          'No additional details',
       },
     };
 
