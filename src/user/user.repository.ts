@@ -1,6 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { PrismaClient } from 'generated/prisma/client';
-import { Prisma } from 'generated/prisma/client';
+import { PrismaClient, Prisma } from 'generated/prisma/client';
 import { USER_SELECT } from 'src/utils/selects';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from 'src/utils/schemas/user.schema';
@@ -9,7 +8,7 @@ export class UserRepository {
   constructor(
     @Inject('PrismaService')
     private readonly prisma: PrismaClient,
-  ) {}
+  ) { }
 
   user(where: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUniqueOrThrow({
