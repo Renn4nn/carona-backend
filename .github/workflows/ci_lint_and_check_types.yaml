@@ -22,6 +22,9 @@ jobs:
       - name: 🛠️ Setup Dependencies
         uses: ./.github/actions/setup
 
+      - name: ◭ Generate Prisma Client
+        run: pnpm prisma generate
+
       - name: 🧹 Run Lint
         run: pnpm lint
 
