@@ -10,3 +10,10 @@ export const USER_SELECT: Prisma.UserSelect = {
   updatedAt: true,
   createdAt: true,
 };
+
+export const authenticationUserSelect = {
+  id: true,
+  login: true,
+  admin: true,
+  active: true,
+} satisfies Prisma.UserSelect;
