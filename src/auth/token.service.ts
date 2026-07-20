@@ -9,7 +9,7 @@ export class TokenService {
   constructor(
     private readonly jwtService: JwtService,
     private configService: ConfigService,
-  ) { }
+  ) {}
 
   async generateTokens(
     userId: string,
