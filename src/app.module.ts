@@ -16,7 +16,10 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.production', '.env.development', '.env'],
+      envFilePath: [
+        `.env.${process.env.NODE_ENV}`,
+        '.env',
+      ]
     }),
     CustomPrismaModule.forRootAsync({
       name: 'PrismaService',
@@ -55,4 +58,4 @@ import { AuthModule } from './auth/auth.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
