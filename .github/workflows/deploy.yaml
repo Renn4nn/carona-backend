@@ -80,7 +80,7 @@ jobs:
             "$VPS_USER@$VPS_HOST" << 'EOF'
               set -euo pipefail
 
-              cd ~/CARONA/carona-backend
+              cd /var/www/CARONA/carona-frontend
 
               git fetch origin main
               git reset --hard origin/main
