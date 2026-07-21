@@ -1,12 +1,20 @@
-name: Deploy Backend
+name: CI & Deploy Backend
 
 on:
   push:
     branches:
       - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
 
 concurrency:
-  group: deploy-backend-production
+  group: backend-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -14,9 +22,6 @@ jobs:
     name: Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions:
-      contents: read
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +44,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -80,7 +86,7 @@ jobs:
             "$VPS_USER@$VPS_HOST" << 'EOF'
               set -euo pipefail
 
-              cd /var/www/CARONA/carona-frontend
+              cd /var/www/CARONA/carona-backend
 
               git fetch origin main
               git reset --hard origin/main
