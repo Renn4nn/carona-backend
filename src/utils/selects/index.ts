@@ -5,7 +5,14 @@ import { Prisma } from 'generated/prisma/client';
 export const USER_SELECT: Prisma.UserSelect = {
   id: true,
   login: true,
-  admin: true,
+  role: {
+    select: {
+      id: true,
+      code: true,
+      name: true,
+      active: true,
+    },
+  },
   active: true,
   updatedAt: true,
   createdAt: true,
@@ -14,6 +21,20 @@ export const USER_SELECT: Prisma.UserSelect = {
 export const authenticationUserSelect = {
   id: true,
   login: true,
-  admin: true,
+  password: true,
+  role: {
+    select: {
+      code: true,
+    },
+  },
   active: true,
 } satisfies Prisma.UserSelect;
+
+export const ROLE_SELECT = {
+  id: true,
+  code: true,
+  name: true,
+  active: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.RoleSelect;

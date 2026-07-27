@@ -3,7 +3,7 @@ export type TokenType = 'access' | 'refresh';
 export type JwtPayload = {
   sub: string;
   login: string;
-  admin: boolean;
+  role: string;
   type: TokenType;
   jti: string;
 };
@@ -11,7 +11,7 @@ export type JwtPayload = {
 export type AuthenticatedUser = {
   id: string;
   login: string;
-  admin: boolean;
+  role: string;
 };
 
 export type AuthTokens = {

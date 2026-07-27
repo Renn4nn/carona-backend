@@ -14,7 +14,7 @@ export class TokenService {
   async generateTokens(
     userId: string,
     login: string,
-    admin: boolean,
+    role: string,
   ): Promise<AuthTokens> {
     const accessExpiresInRaw = this.configService.get<string>(
       'JWT_ACCESS_EXPIRES_IN',
@@ -40,7 +40,7 @@ export class TokenService {
     const accessPayload: JwtPayload = {
       sub: userId,
       login,
-      admin,
+      role,
       type: 'access',
       jti: accessTokenJti,
     };
@@ -48,7 +48,7 @@ export class TokenService {
     const refreshPayload: JwtPayload = {
       sub: userId,
       login,
-      admin,
+      role,
       type: 'refresh',
       jti: refreshTokenJti,
     };

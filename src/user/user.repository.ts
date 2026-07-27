@@ -31,6 +31,11 @@ export class UserRepository {
       data: {
         ...params,
         password: hashPassword,
+        role: {
+          connect: {
+            code: 'USER',
+          },
+        },
       },
       select: USER_SELECT,
     });

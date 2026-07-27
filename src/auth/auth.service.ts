@@ -31,14 +31,14 @@ export class AuthService {
     const tokens = await this.tokenService.generateTokens(
       newUser.id,
       newUser.login,
-      newUser.admin,
+      newUser.role.code,
     );
 
     return {
       user: {
         id: newUser.id,
         login: newUser.login,
-        admin: newUser.admin,
+        role: newUser.role.code,
       },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -62,14 +62,14 @@ export class AuthService {
     const tokens = await this.tokenService.generateTokens(
       user.id,
       user.login,
-      user.admin,
+      user.role.code,
     );
 
     return {
       user: {
         id: user.id,
         login: user.login,
-        admin: user.admin,
+        role: user.role.code,
       },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -95,11 +95,11 @@ export class AuthService {
     const tokens = await this.tokenService.generateTokens(
       user.id,
       user.login,
-      user.admin,
+      user.role.code,
     );
 
     return {
-      user: { id: user.id, login: user.login, admin: user.admin },
+      user: { id: user.id, login: user.login, role: user.role.code },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       expiresIn: tokens.expiresIn,

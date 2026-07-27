@@ -1,5 +1,4 @@
 import z from 'zod';
-import type { Prisma } from 'generated/prisma/client';
 import { createZodDto } from 'nestjs-zod';
 
 export const createUserSchema = z.strictObject({
@@ -14,10 +13,10 @@ export const createUserSchema = z.strictObject({
       error: 'Campo Senha é obrigatório',
     })
     .min(6, 'Campo Senha deve ter pelo menos 6 caracteres'),
-}) satisfies z.ZodType<Prisma.UserCreateInput>;
+});
 
 export const registerUserSchema = z
-  .object({
+  .strictObject({
     login: z
       .string({
         error: 'Campo Login é obrigatório',
@@ -42,12 +41,16 @@ export const registerUserSchema = z
 export const userSchema = z.strictObject({
   id: z.uuid(),
   login: z.string(),
-  password: z.string(),
-  admin: z.boolean(),
+  role: z.strictObject({
+    id: z.uuid(),
+    code: z.string(),
+    name: z.string(),
+    active: z.boolean(),
+  }),
   active: z.boolean(),
   updatedAt: z.coerce.date(),
   createdAt: z.coerce.date(),
-}) satisfies z.ZodType<Prisma.UserModel>;
+});
 
 export const updateUserSchema = createUserSchema.partial();
 

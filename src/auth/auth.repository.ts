@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/utils/schemas/user.schema';
-import { USER_SELECT } from 'src/utils/selects';
+import { authenticationUserSelect, USER_SELECT } from 'src/utils/selects';
 
 @Injectable()
 export class AuthRepository {
@@ -14,6 +14,7 @@ export class AuthRepository {
   async findByLogin(login: string) {
     return this.prisma.user.findUnique({
       where: { login },
+      select: authenticationUserSelect,
     });
   }
 
@@ -32,6 +33,11 @@ export class AuthRepository {
       data: {
         ...params,
         password: hashPassword,
+        role: {
+          connect: {
+            code: 'USER',
+          },
+        },
       },
       select: USER_SELECT,
     });

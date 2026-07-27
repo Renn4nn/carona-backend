@@ -12,8 +12,21 @@ model User {
   id        String   @id @default(uuid())
   login     String   @unique
   password  String
-  admin     Boolean  @default(false)
+  roleId    String
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@index([roleId])
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
 }
