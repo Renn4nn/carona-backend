@@ -9,9 +9,9 @@ import {
 } from './utils/filters';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomPrismaModule, PrismaClientFactory } from './utils/extensions';
-import { UserModule } from './user/user.module';
+import { UserModule } from './module/user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { RoleModule } from './role/role.module';
+import { RoleModule } from './module/role/role.module';
 
 @Module({
   imports: [
