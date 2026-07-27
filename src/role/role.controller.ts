@@ -1,9 +1,17 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/JwtGuard';
 import type { RoleSchema } from 'src/utils/schemas/role.schema';
 import type { ApiSuccessResponse } from 'src/utils/types/api/api';
 import { RoleService } from './role.service';
 
 @Controller('roles')
+@UseGuards(JwtAuthGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 

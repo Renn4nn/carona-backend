@@ -7,7 +7,9 @@ import {
   Body,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/JwtGuard';
 import { UserService } from './user.service';
 import { ApiSuccessResponse } from 'src/utils/types/api/api';
 import {
@@ -17,6 +19,7 @@ import {
 } from 'src/utils/schemas/user.schema';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(
     private readonly service: UserService,
