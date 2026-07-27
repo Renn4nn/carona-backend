@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   // Cria a aplicação
@@ -11,6 +12,8 @@ async function bootstrap() {
 
   // Config
   const configService = app.get(ConfigService);
+
+  app.use(cookieParser());
 
   // Proxy
   app.set('trust proxy', 1);
@@ -21,15 +24,17 @@ async function bootstrap() {
   // CORS
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')
     ? configService
-        .get<string>('ALLOWED_ORIGINS')!
-        .split(',')
-        .map((o) => o.trim())
+      .get<string>('ALLOWED_ORIGINS')!
+      .split(',')
+      .map((o) => o.trim())
     : [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'https://localhost:3000',
-        'https://localhost:3001',
-      ];
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://localhost:3000',
+      'https://localhost:3001',
+      'http://srv1819497.hstgr.cloud/',
+      'https://srv1819497.hstgr.cloud/'
+    ];
 
   app.enableCors({
     origin: (
