@@ -9,16 +9,18 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  login          String          @unique
-  password       String
-  roleId         String
-  active         Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  role           Role            @relation(fields: [roleId], references: [id], onDelete: Restrict)
-  studentProfile StudentProfile?
-  vehicles       Vehicle[]
+  id                 String            @id @default(uuid())
+  login              String            @unique
+  password           String
+  roleId             String
+  active             Boolean           @default(false)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  role               Role              @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  studentProfile     StudentProfile?
+  vehicles           Vehicle[]
+  createdRides       Ride[]            @relation("RideDriver")
+  rideParticipations RideParticipant[]
 
   @@index([roleId])
 }
@@ -93,7 +95,113 @@ model Vehicle {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   owner             User     @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  rides             Ride[]
 
   @@index([ownerId])
   @@index([active])
+}
+
+model RideStatus {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  description  String?
+  active       Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  rides        Ride[]
+
+  @@index([active, displayOrder])
+}
+
+model ParticipantStatus {
+  id           String            @id @default(uuid())
+  code         String            @unique
+  name         String
+  description  String?
+  active       Boolean           @default(true)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  participants RideParticipant[]
+
+  @@index([active, displayOrder])
+}
+
+model PaymentMethod {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  description  String?
+  active       Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  rides        Ride[]
+
+  @@index([active, displayOrder])
+}
+
+model Ride {
+  id                   String            @id @default(uuid())
+  driverId             String
+  vehicleId            String
+  statusId             String
+  paymentMethodId      String?
+  originName           String
+  originAddress        String
+  originLatitude       Decimal?          @db.Decimal(10, 7)
+  originLongitude      Decimal?          @db.Decimal(10, 7)
+  destinationName      String
+  destinationAddress   String
+  destinationLatitude  Decimal?          @db.Decimal(10, 7)
+  destinationLongitude Decimal?          @db.Decimal(10, 7)
+  departureAt          DateTime          @db.Timestamptz(3)
+  estimatedArrivalAt   DateTime?         @db.Timestamptz(3)
+  totalSeats           Int
+  availableSeats       Int
+  contributionPerSeat  Decimal           @default(0) @db.Decimal(10, 2)
+  paymentNotes         String?
+  description          String?
+  rules                String?
+  startedAt            DateTime?         @db.Timestamptz(3)
+  completedAt          DateTime?         @db.Timestamptz(3)
+  canceledAt           DateTime?         @db.Timestamptz(3)
+  cancellationReason   String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  driver               User              @relation("RideDriver", fields: [driverId], references: [id], onDelete: Restrict)
+  vehicle              Vehicle           @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  status               RideStatus        @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  paymentMethod        PaymentMethod?    @relation(fields: [paymentMethodId], references: [id], onDelete: Restrict)
+  participants         RideParticipant[]
+
+  @@index([statusId, departureAt])
+  @@index([driverId, departureAt])
+  @@index([vehicleId, departureAt])
+  @@index([paymentMethodId])
+}
+
+model RideParticipant {
+  id                 String            @id @default(uuid())
+  rideId             String
+  userId             String
+  statusId           String
+  message            String?
+  requestedAt        DateTime          @default(now()) @db.Timestamptz(3)
+  respondedAt        DateTime?         @db.Timestamptz(3)
+  canceledAt         DateTime?         @db.Timestamptz(3)
+  completedAt        DateTime?         @db.Timestamptz(3)
+  cancellationReason String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  ride               Ride              @relation(fields: [rideId], references: [id], onDelete: Restrict)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  status             ParticipantStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
+
+  @@unique([rideId, userId])
+  @@index([rideId, statusId])
+  @@index([userId, statusId])
+  @@index([statusId])
 }

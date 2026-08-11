@@ -16,6 +16,11 @@ import { UniversityModule } from './module/university/university.module';
 import { CourseModule } from './module/course/course.module';
 import { StudentProfileModule } from './module/student-profile/student-profile.module';
 import { VehicleModule } from './module/vehicle/vehicle.module';
+import { RideStatusModule } from './module/ride-status/ride-status.module';
+import { ParticipantStatusModule } from './module/participant-status/participant-status.module';
+import { PaymentMethodModule } from './module/payment-method/payment-method.module';
+import { RideModule } from './module/ride/ride.module';
+import { RideParticipantModule } from './module/ride-participant/ride-participant.module';
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import { VehicleModule } from './module/vehicle/vehicle.module';
     CourseModule,
     StudentProfileModule,
     VehicleModule,
+    RideStatusModule,
+    ParticipantStatusModule,
+    PaymentMethodModule,
+    RideModule,
+    RideParticipantModule,
   ],
   providers: [
     {

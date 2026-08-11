@@ -8,5 +8,6 @@ import { VehicleService } from './vehicle.service';
   imports: [UserModule],
   controllers: [VehicleController],
   providers: [VehicleService, VehicleRepository],
+  exports: [VehicleService],
 })
 export class VehicleModule {}

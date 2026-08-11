@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -70,6 +71,14 @@ export class VehicleService {
     await this.userService.assertActive(userId);
     await this.getOwned(userId, id);
     return this.vehicleRepository.setActive(id, true);
+  }
+
+  async getActiveOwned(userId: string, id: string): Promise<VehicleSchema> {
+    const vehicle = await this.getOwned(userId, id);
+    if (!vehicle.active) {
+      throw new BadRequestException('O veículo selecionado está inativo.');
+    }
+    return vehicle;
   }
 
   private async getOwned(userId: string, id: string): Promise<VehicleSchema> {

@@ -12,6 +12,14 @@ export type ApiSuccessResponse<T extends DataType> = {
   data: T;
 };
 
+export type CursorPage<T> = {
+  items: T[];
+  pageInfo: {
+    nextCursor: string | null;
+    hasNextPage: boolean;
+  };
+};
+
 export type ApiMessageResponse<T> = {
   data: T;
 };
