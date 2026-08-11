@@ -693,3 +693,6 @@ Ao receber uma tarefa:
 13. Garantir que regras concorrentes usem transação.
 14. Apontar divergências relevantes entre documentação e código.
 15. Apresentar resumo objetivo das alterações realizadas.
+
+# 22. FUTURE
+Um usuário possui no máximo um perfil e um curso atual. Múltiplos cursos ou histórico futuro serão modelados por uma entidade Enrollment, não por muitos-para-muitos direto no MVP.

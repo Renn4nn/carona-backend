@@ -1,9 +1,10 @@
-import { Inject } from '@nestjs/common';
-import { PrismaClient, Prisma } from 'generated/prisma/client';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Prisma, PrismaClient } from 'generated/prisma/client';
 import { USER_SELECT } from 'src/utils/selects';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from 'src/utils/schemas/user.schema';
 
+@Injectable()
 export class UserRepository {
   constructor(
     @Inject('PrismaService')
@@ -21,6 +22,22 @@ export class UserRepository {
     return this.prisma.user.findMany({
       orderBy: { createdAt: 'asc' },
       select: USER_SELECT,
+    });
+  }
+
+  findAccessById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        active: true,
+        role: {
+          select: {
+            code: true,
+            active: true,
+          },
+        },
+      },
     });
   }
 

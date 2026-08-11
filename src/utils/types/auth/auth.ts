@@ -14,6 +14,12 @@ export type AuthenticatedUser = {
   role: string;
 };
 
+export type RequestUser = {
+  userId: string;
+  login: string;
+  role: string;
+};
+
 export type AuthTokens = {
   accessToken: string;
   refreshToken: string;

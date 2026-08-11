@@ -12,6 +12,10 @@ import { CustomPrismaModule, PrismaClientFactory } from './utils/extensions';
 import { UserModule } from './module/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './module/role/role.module';
+import { UniversityModule } from './module/university/university.module';
+import { CourseModule } from './module/course/course.module';
+import { StudentProfileModule } from './module/student-profile/student-profile.module';
+import { VehicleModule } from './module/vehicle/vehicle.module';
 
 @Module({
   imports: [
@@ -28,6 +32,10 @@ import { RoleModule } from './module/role/role.module';
     UserModule,
     AuthModule,
     RoleModule,
+    UniversityModule,
+    CourseModule,
+    StudentProfileModule,
+    VehicleModule,
   ],
   providers: [
     {
