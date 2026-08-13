@@ -1,5 +1,6 @@
 import z from 'zod';
 import { createZodDto } from 'nestjs-zod';
+import { createStudentProfileSchema } from './student-profile.schema';
 
 export const createUserSchema = z.strictObject({
   login: z
@@ -18,10 +19,10 @@ export const createUserSchema = z.strictObject({
 export const registerUserSchema = z
   .strictObject({
     login: z
-      .string({
-        error: 'Campo Login é obrigatório',
-      })
-      .min(3, 'Campo Login deve ter pelo menos 3 caracteres'),
+      .string({ error: 'Campo E-mail institucional é obrigatório' })
+      .trim()
+      .email('Informe um e-mail válido')
+      .transform((login) => login.toLowerCase()),
     password: z
       .string({
         error: 'Campo Senha é obrigatório',
@@ -32,6 +33,7 @@ export const registerUserSchema = z
         error: 'Confirmação de senha é obrigatória',
       })
       .min(6, 'Confirmação de senha deve ter pelo menos 6 caracteres'),
+    studentProfile: createStudentProfileSchema,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',

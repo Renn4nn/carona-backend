@@ -21,6 +21,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const userLogin = process.env.USER_LOGIN || 'user.carona';
   const userPassword = process.env.USER_PASSWORD || 'user.carona';
+  const studentName = process.env.STUDENT_NAME || 'Usuario Carona';
 
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(userPassword, salt);
@@ -109,6 +110,7 @@ async function main() {
       userId: user.id,
     },
     update: {
+      name: studentName,
       courseId: computerScienceCourse.id,
       registration: '20260001',
       active: true,
@@ -116,6 +118,7 @@ async function main() {
     create: {
       userId: user.id,
       courseId: computerScienceCourse.id,
+      name: studentName,
       registration: '20260001',
       active: true,
     },
@@ -137,6 +140,7 @@ async function main() {
   console.log('  -', softwareEngineeringCourse.name);
   console.log('');
   console.log('Student profile:');
+  console.log('  - Name:', studentProfile.name);
   console.log('  - Registration:', studentProfile.registration);
   console.log('  - Course:', computerScienceCourse.name);
 }

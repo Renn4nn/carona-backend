@@ -3,6 +3,11 @@ import z from 'zod';
 import { courseSchema } from './course.schema';
 
 export const createStudentProfileSchema = z.strictObject({
+  name: z
+    .string({ error: 'Campo Nome é obrigatório' })
+    .trim()
+    .min(2, 'Campo Nome deve ter pelo menos 2 caracteres')
+    .max(120, 'Campo Nome deve ter no máximo 120 caracteres'),
   courseId: z.uuid({ error: 'Curso inválido' }),
   registration: z
     .string({ error: 'Campo Matrícula é obrigatório' })
@@ -17,6 +22,7 @@ export const studentProfileSchema = z.strictObject({
   id: z.uuid(),
   userId: z.uuid(),
   courseId: z.uuid(),
+  name: z.string(),
   registration: z.string(),
   active: z.boolean(),
   course: courseSchema,

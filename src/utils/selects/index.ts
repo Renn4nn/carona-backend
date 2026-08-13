@@ -65,6 +65,7 @@ export const STUDENT_PROFILE_SELECT = {
   id: true,
   userId: true,
   courseId: true,
+  name: true,
   registration: true,
   active: true,
   course: {

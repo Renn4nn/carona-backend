@@ -18,6 +18,7 @@ describe('StudentProfileService', () => {
     userService as unknown as UserService,
   );
   const data = {
+    name: 'Estudante Teste',
     courseId: '85f45fb4-3bf9-4a53-a685-5eb63572d61e',
     registration: '20260001',
   };
@@ -30,6 +31,12 @@ describe('StudentProfileService', () => {
         courseId: data.courseId,
         registration: ' ',
       }).success,
+    ).toBe(false);
+  });
+
+  it('exige nome do estudante', () => {
+    expect(
+      createStudentProfileSchema.safeParse({ ...data, name: ' ' }).success,
     ).toBe(false);
   });
 

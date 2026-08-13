@@ -1,6 +1,8 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from 'src/utils/schemas/user.schema';
@@ -19,15 +21,22 @@ export class AuthService {
   async signUp(
     data: RegisterUserDto,
   ): Promise<AuthResult & { refreshToken: string }> {
-    const userExists = await this.authRepository.findByLogin(data.login);
-    if (userExists) {
-      throw new ConflictException('Este usuário já está cadastrado!');
+    const creation = await this.authRepository.createStudentAccount(data);
+    if (creation.status === 'login_taken') {
+      throw new ConflictException('Este e-mail já está cadastrado!');
+    }
+    if (creation.status === 'role_unavailable') {
+      throw new ServiceUnavailableException(
+        'Não foi possível concluir o cadastro neste momento.',
+      );
+    }
+    if (creation.status === 'course_unavailable') {
+      throw new NotFoundException(
+        'Curso não encontrado ou indisponível para cadastro.',
+      );
     }
 
-    const { confirmPassword, ...userData } = data;
-    void confirmPassword;
-
-    const newUser = await this.authRepository.createUser(userData);
+    const newUser = creation.user;
     const tokens = await this.tokenService.generateTokens(
       newUser.id,
       newUser.login,
