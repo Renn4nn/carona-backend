@@ -27,16 +27,12 @@ export class RideRepository {
         gte: query.departureFrom ?? (publicSearch ? new Date() : undefined),
         lte: query.departureTo,
       },
-      originName: query.origin
+      originAddress: query.origin
         ? { contains: query.origin, mode: 'insensitive' }
         : undefined,
-      destinationName: query.destination
+      destinationAddress: query.destination
         ? { contains: query.destination, mode: 'insensitive' }
         : undefined,
-      contributionPerSeat:
-        query.maxContribution === undefined
-          ? undefined
-          : { lte: query.maxContribution },
       availableSeats: query.availableOnly === 'true' ? { gt: 0 } : undefined,
     };
   }
@@ -107,19 +103,31 @@ export class RideRepository {
     });
   }
 
-  create(driverId: string, statusId: string, data: CreateRideSchema) {
+  create(
+    driverId: string,
+    statusId: string,
+    totalSeats: number,
+    data: CreateRideSchema,
+  ) {
     return this.prisma.ride.create({
       data: {
         ...data,
         driverId,
         statusId,
-        availableSeats: data.totalSeats,
+        totalSeats,
+        availableSeats: totalSeats,
       },
       select: RIDE_DETAIL_SELECT,
     });
   }
 
-  update(id: string, data: UpdateRideSchema & { availableSeats?: number }) {
+  update(
+    id: string,
+    data: UpdateRideSchema & {
+      totalSeats?: number;
+      availableSeats?: number;
+    },
+  ) {
     return this.prisma.ride.update({
       where: { id },
       data,

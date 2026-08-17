@@ -15,9 +15,9 @@ flowchart TB
   PROFILE["STUDENT_PROFILE<br/>──────────<br/>PK id<br/>FK/UK userId<br/>FK courseId<br/>fullName<br/>registrationNumber<br/>institutionalEmail<br/>createdAt<br/>updatedAt"]
   VEHICLE["VEHICLE<br/>──────────<br/>PK id<br/>FK ownerId<br/>UK plate<br/>brand<br/>model<br/>color<br/>year<br/>seats<br/>active<br/>createdAt<br/>updatedAt"]
   RIDE_STATUS["RIDE_STATUS<br/>──────────<br/>PK id<br/>UK code<br/>name<br/>active<br/>createdAt<br/>updatedAt"]
-  RIDE["RIDE<br/>──────────<br/>PK id<br/>FK driverId<br/>FK vehicleId<br/>FK statusId<br/>origin<br/>destination<br/>departureAt<br/>totalSeats<br/>availableSeats<br/>pricePerSeat<br/>notes<br/>cancellationReason<br/>canceledAt<br/>completedAt<br/>createdAt<br/>updatedAt"]
+  RIDE["RIDE<br/>──────────<br/>PK id<br/>FK driverId<br/>FK vehicleId<br/>FK statusId<br/>originAddress<br/>originLatitude<br/>originLongitude<br/>destinationAddress<br/>destinationLatitude<br/>destinationLongitude<br/>departureAt<br/>estimatedArrivalAt<br/>totalSeats<br/>availableSeats<br/>notes<br/>cancellationReason<br/>canceledAt<br/>completedAt<br/>createdAt<br/>updatedAt"]
   PARTICIPANT_STATUS["PARTICIPANT_STATUS<br/>──────────<br/>PK id<br/>UK code<br/>name<br/>active<br/>createdAt<br/>updatedAt"]
-  PARTICIPANT["RIDE_PARTICIPANT<br/>──────────<br/>PK id<br/>FK rideId<br/>FK passengerId<br/>FK statusId<br/>requestedAt<br/>decidedAt<br/>canceledAt<br/>updatedAt<br/>UK rideId + passengerId"]
+  PARTICIPANT["RIDE_PARTICIPANT<br/>──────────<br/>PK id<br/>FK rideId<br/>FK passengerId<br/>FK statusId<br/>dropoffAddress<br/>dropoffLatitude<br/>dropoffLongitude<br/>distanceMeters<br/>rideAmount<br/>platformFee<br/>totalAmount<br/>priceCalculatedAt<br/>requestedAt<br/>decidedAt<br/>canceledAt<br/>updatedAt<br/>UK rideId + passengerId"]
   REVIEW["REVIEW<br/>──────────<br/>PK id<br/>FK rideId<br/>FK authorId<br/>FK reviewedUserId<br/>rating<br/>comment<br/>createdAt<br/>updatedAt<br/>UK rideId + authorId + reviewedUserId"]
 
   HAS_ROLE{"POSSUI"}

@@ -34,7 +34,7 @@ Objetivo do MVP:
 - avaliações entre participantes;
 - estrutura de autorização preparada para um painel administrativo futuro.
 
-Pagamentos não serão processados pela plataforma no MVP. O valor pode ser informado na carona, mas qualquer pagamento deve ser combinado diretamente entre os participantes.
+Pagamentos não serão processados pela plataforma no MVP. O valor pertence à participação e será calculado pela distância entre o ponto inicial e o desembarque do passageiro, com pagamento tratado em fluxo futuro.
 
 ## 2. Estado atual do backend
 
@@ -428,7 +428,9 @@ Carona:
 - carona pertence a um motorista;
 - carona utiliza um veículo do motorista;
 - data de saída deve ser futura na criação;
-- número de vagas deve ser maior que zero;
+- `totalSeats` deve ser preenchido pelo backend com a capacidade de passageiros do veículo no momento da publicação;
+- `availableSeats` deve iniciar com o mesmo valor de `totalSeats`;
+- a capacidade da carona é um snapshot histórico e não muda quando o veículo é editado posteriormente;
 - `availableSeats` não pode ser maior que `totalSeats`;
 - carona cancelada não aceita novas solicitações;
 - carona lotada não aceita novas solicitações;
@@ -439,6 +441,8 @@ Carona:
 Participante:
 
 - solicitação é representada por `RideParticipant`;
+- o desembarque, a distância e os valores calculados pertencem à participação, não à carona;
+- o preço confirmado deve permanecer congelado mesmo após a entrada de outros passageiros;
 - passageiro só pode possuir uma participação por carona;
 - participação inicia como pendente;
 - apenas motorista pode aceitar ou recusar;

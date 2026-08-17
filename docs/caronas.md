@@ -138,7 +138,7 @@ Toda carona possui obrigatoriamente:
 - destino final do motorista;
 - data;
 - horário de saída;
-- quantidade de vagas disponíveis;
+- quantidade de vagas disponíveis, copiada da capacidade do veículo;
 - situação da carona.
 
 O motorista define inicialmente apenas sua própria rota:
@@ -203,10 +203,9 @@ O motorista deverá informar:
 - destino final;
 - data;
 - horário;
-- quantidade de vagas disponibilizadas;
 - observações opcionais.
 
-A quantidade de vagas disponibilizadas não poderá ultrapassar a capacidade de passageiros cadastrada no veículo.
+A quantidade de vagas será definida automaticamente pela capacidade de passageiros cadastrada no veículo. O motorista não informa a lotação novamente ao publicar a carona.
 
 Exemplo:
 
@@ -214,15 +213,11 @@ Exemplo:
 Veículo:
 4 vagas para passageiros
 
-Motorista pode publicar:
-1 vaga
-2 vagas
-3 vagas
-4 vagas
-
-Não pode publicar:
-5 vagas
+Carona publicada:
+4 vagas disponíveis
 ```
+
+Esse valor é armazenado como um snapshot da carona. Alterações posteriores na capacidade do veículo afetam apenas novas publicações.
 
 Depois da publicação, a carona fica disponível para receber solicitações.
 
@@ -376,7 +371,7 @@ Nesse caso:
 
 # 13. Limite de passageiros
 
-No MVP, o número máximo de passageiros aceitos será limitado pela quantidade de vagas disponibilizadas pelo motorista.
+No MVP, o número máximo de passageiros aceitos será limitado pela capacidade do veículo copiada para a carona no momento da publicação.
 
 Exemplo:
 
@@ -1431,7 +1426,7 @@ Além das telas comuns:
 - Definir ponto inicial
 - Definir destino
 - Definir data/horário
-- Definir vagas
+- Confirmar as vagas obtidas do veículo
 - Revisar publicação
 - Gerenciar carona
 - Solicitações pendentes
@@ -1508,7 +1503,7 @@ Essas funcionalidades não devem aumentar desnecessariamente a complexidade do p
 
 O Carona Universitária funciona através de um modelo simples:
 
-> Um estudante informa que realizará determinado trajeto e disponibiliza vagas em seu veículo.
+> Um estudante informa que realizará determinado trajeto e o sistema disponibiliza as vagas cadastradas no veículo escolhido.
 
 > Todos os passageiros embarcam no mesmo ponto inicial.
 

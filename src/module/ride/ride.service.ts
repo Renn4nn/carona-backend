@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ParticipantStatusService } from 'src/module/participant-status/participant-status.service';
-import { PaymentMethodService } from 'src/module/payment-method/payment-method.service';
 import { RideStatusService } from 'src/module/ride-status/ride-status.service';
 import { UserService } from 'src/module/user/user.service';
 import { VehicleService } from 'src/module/vehicle/vehicle.service';
@@ -26,20 +25,13 @@ import { RideRepository } from './ride.repository';
 
 const STRUCTURAL_FIELDS: (keyof UpdateRideSchema)[] = [
   'vehicleId',
-  'paymentMethodId',
-  'originName',
   'originAddress',
   'originLatitude',
   'originLongitude',
-  'destinationName',
   'destinationAddress',
   'destinationLatitude',
   'destinationLongitude',
   'departureAt',
-  'estimatedArrivalAt',
-  'totalSeats',
-  'contributionPerSeat',
-  'paymentNotes',
 ];
 
 @Injectable()
@@ -50,7 +42,6 @@ export class RideService {
     private readonly vehicleService: VehicleService,
     private readonly rideStatusService: RideStatusService,
     private readonly participantStatusService: ParticipantStatusService,
-    private readonly paymentMethodService: PaymentMethodService,
   ) {}
 
   async findPublicMany(
@@ -98,21 +89,19 @@ export class RideService {
       userId,
       data.vehicleId,
     );
-    this.validateCapacity(data.totalSeats, vehicle.passengerCapacity);
     this.validateDeparture(new Date(data.departureAt));
-    this.validateDistinctLocations(
-      data.originName,
-      data.originAddress,
-      data.destinationName,
-      data.destinationAddress,
-    );
-    if (data.paymentMethodId) {
-      await this.paymentMethodService.getActiveById(data.paymentMethodId);
-    }
+    this.validateDistinctLocations(data.originAddress, data.destinationAddress);
     const status = await this.rideStatusService.getActiveByCode(
       RIDE_STATUS.OPEN,
     );
-    return mapRide(await this.repository.create(userId, status.id, data));
+    return mapRide(
+      await this.repository.create(
+        userId,
+        status.id,
+        vehicle.passengerCapacity,
+        data,
+      ),
+    );
   }
 
   async update(
@@ -134,29 +123,18 @@ export class RideService {
       STRUCTURAL_FIELDS.some((field) => data[field] !== undefined)
     ) {
       throw new ConflictException(
-        'Após aceitar passageiros, apenas descrição e regras podem ser alteradas.',
+        'Após aceitar passageiros, apenas as observações podem ser alteradas.',
       );
     }
 
-    const vehicleId = data.vehicleId ?? ride.vehicleId;
-    const vehicle = await this.vehicleService.getActiveOwned(userId, vehicleId);
-    const totalSeats = data.totalSeats ?? ride.totalSeats;
-    this.validateCapacity(totalSeats, vehicle.passengerCapacity);
+    const vehicle = data.vehicleId
+      ? await this.vehicleService.getActiveOwned(userId, data.vehicleId)
+      : undefined;
 
     const departureAt = data.departureAt
       ? new Date(data.departureAt)
       : ride.departureAt;
     if (data.departureAt) this.validateDeparture(departureAt);
-    const estimatedArrivalAt =
-      (data.estimatedArrivalAt
-        ? new Date(data.estimatedArrivalAt)
-        : ride.estimatedArrivalAt) ?? undefined;
-    if (estimatedArrivalAt && estimatedArrivalAt <= departureAt) {
-      throw new BadRequestException(
-        'A chegada estimada deve ser posterior à partida.',
-      );
-    }
-
     const originLatitude =
       data.originLatitude ?? ride.originLatitude?.toNumber();
     const originLongitude =
@@ -173,29 +151,19 @@ export class RideService {
     );
 
     this.validateDistinctLocations(
-      data.originName ?? ride.originName,
       data.originAddress ?? ride.originAddress,
-      data.destinationName ?? ride.destinationName,
       data.destinationAddress ?? ride.destinationAddress,
     );
 
-    const contribution =
-      data.contributionPerSeat ?? ride.contributionPerSeat.toNumber();
-    const paymentMethodId = data.paymentMethodId ?? ride.paymentMethodId;
-    if (contribution > 0 && !paymentMethodId) {
-      throw new BadRequestException(
-        'Informe o método para contribuições maiores que zero.',
-      );
-    }
-    if (data.paymentMethodId) {
-      await this.paymentMethodService.getActiveById(data.paymentMethodId);
-    }
-
-    const updateData: UpdateRideSchema & { availableSeats?: number } = {
+    const updateData: UpdateRideSchema & {
+      totalSeats?: number;
+      availableSeats?: number;
+    } = {
       ...data,
     };
-    if (data.totalSeats !== undefined) {
-      updateData.availableSeats = data.totalSeats;
+    if (vehicle) {
+      updateData.totalSeats = vehicle.passengerCapacity;
+      updateData.availableSeats = vehicle.passengerCapacity;
     }
     return mapRide(await this.repository.update(id, updateData));
   }
@@ -324,24 +292,13 @@ export class RideService {
     }
   }
 
-  private validateCapacity(totalSeats: number, vehicleCapacity: number) {
-    if (totalSeats > vehicleCapacity) {
-      throw new BadRequestException(
-        'A quantidade de vagas excede a capacidade do veículo.',
-      );
-    }
-  }
-
   private validateDistinctLocations(
-    originName: string,
     originAddress: string,
-    destinationName: string,
     destinationAddress: string,
   ) {
     if (
-      originName.toLocaleLowerCase() === destinationName.toLocaleLowerCase() &&
       originAddress.toLocaleLowerCase() ===
-        destinationAddress.toLocaleLowerCase()
+      destinationAddress.toLocaleLowerCase()
     ) {
       throw new BadRequestException('Origem e destino devem ser diferentes.');
     }

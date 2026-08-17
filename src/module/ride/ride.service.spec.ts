@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ParticipantStatusService } from 'src/module/participant-status/participant-status.service';
-import { PaymentMethodService } from 'src/module/payment-method/payment-method.service';
 import { RideStatusService } from 'src/module/ride-status/ride-status.service';
 import { UserService } from 'src/module/user/user.service';
 import { VehicleService } from 'src/module/vehicle/vehicle.service';
@@ -24,54 +19,84 @@ describe('RideService', () => {
   const vehicleService = { getActiveOwned: jest.fn() };
   const rideStatusService = { getActiveByCode: jest.fn() };
   const participantStatusService = { getActiveByCode: jest.fn() };
-  const paymentMethodService = { getActiveById: jest.fn() };
   const service = new RideService(
     repository as unknown as RideRepository,
     userService as unknown as UserService,
     vehicleService as unknown as VehicleService,
     rideStatusService as unknown as RideStatusService,
     participantStatusService as unknown as ParticipantStatusService,
-    paymentMethodService as unknown as PaymentMethodService,
   );
   const baseInput = {
     vehicleId: '85f45fb4-3bf9-4a53-a685-5eb63572d61e',
-    originName: 'Centro',
     originAddress: 'Rua da Origem, 100',
-    destinationName: 'Campus',
     destinationAddress: 'Avenida do Campus, 200',
     departureAt: new Date(Date.now() + 3_600_000).toISOString(),
-    totalSeats: 4,
-    contributionPerSeat: 0,
+    notes: 'Saída pontual.',
   };
 
   beforeEach(() => jest.clearAllMocks());
 
-  it('rejeita contribuição positiva sem método', () => {
-    expect(
-      createRideSchema.safeParse({
-        ...baseInput,
-        contributionPerSeat: 10,
-      }).success,
-    ).toBe(false);
-  });
-
-  it('rejeita coordenadas incompletas e chegada anterior', () => {
+  it('rejeita coordenadas incompletas', () => {
     expect(
       createRideSchema.safeParse({
         ...baseInput,
         originLatitude: -23.5,
-        estimatedArrivalAt: new Date(Date.now() + 1_000).toISOString(),
       }).success,
     ).toBe(false);
   });
 
-  it('rejeita vagas acima da capacidade do veículo', async () => {
+  it('usa a capacidade do veículo como snapshot de vagas', async () => {
     userService.assertActive.mockResolvedValue({});
     vehicleService.getActiveOwned.mockResolvedValue({ passengerCapacity: 3 });
-    await expect(service.create('driver-id', baseInput)).rejects.toBeInstanceOf(
-      BadRequestException,
+    rideStatusService.getActiveByCode.mockResolvedValue({ id: 'status-id' });
+    repository.create.mockResolvedValue({
+      id: 'ride-id',
+      driverId: 'driver-id',
+      vehicleId: baseInput.vehicleId,
+      status: {
+        id: 'status-id',
+        code: 'OPEN',
+        name: 'Aberta',
+        description: null,
+        active: true,
+        displayOrder: 10,
+      },
+      driver: { id: 'driver-id', login: 'motorista' },
+      vehicle: {
+        id: baseInput.vehicleId,
+        ownerId: 'driver-id',
+        brand: 'Honda',
+        model: 'Civic',
+        color: 'Prata',
+        year: 2024,
+        passengerCapacity: 3,
+        active: true,
+      },
+      originAddress: baseInput.originAddress,
+      originLatitude: null,
+      originLongitude: null,
+      destinationAddress: baseInput.destinationAddress,
+      destinationLatitude: null,
+      destinationLongitude: null,
+      departureAt: new Date(baseInput.departureAt),
+      estimatedArrivalAt: null,
+      totalSeats: 3,
+      availableSeats: 3,
+      notes: baseInput.notes,
+      startedAt: null,
+      completedAt: null,
+      canceledAt: null,
+      cancellationReason: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    await service.create('driver-id', baseInput);
+    expect(repository.create).toHaveBeenCalledWith(
+      'driver-id',
+      'status-id',
+      3,
+      baseInput,
     );
-    expect(repository.create).not.toHaveBeenCalled();
   });
 
   it('propaga veículo alheio ou inexistente', async () => {
@@ -90,8 +115,66 @@ describe('RideService', () => {
     });
     repository.countAccepted.mockResolvedValue(1);
     await expect(
-      service.update('driver-id', 'ride-id', { totalSeats: 2 }),
+      service.update('driver-id', 'ride-id', {
+        destinationAddress: 'Outro destino, 300',
+      }),
     ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it('recalcula o snapshot ao trocar o veículo antes de aceitar passageiros', async () => {
+    const repositoryStop = new Error('stop-after-update');
+    userService.assertActive.mockResolvedValue({});
+    repository.findById.mockResolvedValue({
+      driverId: 'driver-id',
+      vehicleId: baseInput.vehicleId,
+      status: { code: 'OPEN' },
+      originAddress: baseInput.originAddress,
+      destinationAddress: baseInput.destinationAddress,
+      departureAt: new Date(baseInput.departureAt),
+      originLatitude: null,
+      originLongitude: null,
+      destinationLatitude: null,
+      destinationLongitude: null,
+    });
+    repository.countAccepted.mockResolvedValue(0);
+    vehicleService.getActiveOwned.mockResolvedValue({ passengerCapacity: 2 });
+    repository.update.mockRejectedValue(repositoryStop);
+
+    await expect(
+      service.update('driver-id', 'ride-id', {
+        vehicleId: 'a9cf92e9-3fc1-4bf5-b942-270104259b88',
+      }),
+    ).rejects.toBe(repositoryStop);
+    expect(repository.update).toHaveBeenCalledWith(
+      'ride-id',
+      expect.objectContaining({ totalSeats: 2, availableSeats: 2 }),
+    );
+  });
+
+  it('mantém o snapshot ao alterar somente observações', async () => {
+    const repositoryStop = new Error('stop-after-update');
+    userService.assertActive.mockResolvedValue({});
+    repository.findById.mockResolvedValue({
+      driverId: 'driver-id',
+      vehicleId: baseInput.vehicleId,
+      status: { code: 'OPEN' },
+      originAddress: baseInput.originAddress,
+      destinationAddress: baseInput.destinationAddress,
+      departureAt: new Date(baseInput.departureAt),
+      originLatitude: null,
+      originLongitude: null,
+      destinationLatitude: null,
+      destinationLongitude: null,
+    });
+    repository.countAccepted.mockResolvedValue(1);
+    repository.update.mockRejectedValue(repositoryStop);
+
+    await expect(
+      service.update('driver-id', 'ride-id', { notes: 'Nova observação' }),
+    ).rejects.toBe(repositoryStop);
+    expect(repository.update).toHaveBeenCalledWith('ride-id', {
+      notes: 'Nova observação',
+    });
   });
 
   it('rejeita início fora do estado OPEN', async () => {
@@ -127,7 +210,7 @@ describe('RideService', () => {
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('mapper público não expõe endereço, motorista ou veículo', () => {
+  it('mapper público expõe o trajeto sem motorista ou veículo', () => {
     const mapped = mapPublicRide({
       id: 'ride-id',
       status: {
@@ -138,17 +221,15 @@ describe('RideService', () => {
         active: true,
         displayOrder: 10,
       },
-      originName: 'Centro',
-      destinationName: 'Campus',
+      originAddress: 'Rua da Origem, 100',
+      destinationAddress: 'Avenida do Campus, 200',
       departureAt: new Date(),
       estimatedArrivalAt: null,
       totalSeats: 4,
       availableSeats: 0,
-      contributionPerSeat: { toFixed: () => '0.00' },
-      paymentMethod: null,
-    } as never);
+    });
     expect(mapped.isFull).toBe(true);
-    expect(mapped).not.toHaveProperty('originAddress');
+    expect(mapped.originAddress).toBe('Rua da Origem, 100');
     expect(mapped).not.toHaveProperty('driver');
     expect(mapped).not.toHaveProperty('vehicle');
   });

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ParticipantStatusModule } from 'src/module/participant-status/participant-status.module';
-import { PaymentMethodModule } from 'src/module/payment-method/payment-method.module';
 import { RideStatusModule } from 'src/module/ride-status/ride-status.module';
 import { UserModule } from 'src/module/user/user.module';
 import { VehicleModule } from 'src/module/vehicle/vehicle.module';
@@ -14,7 +13,6 @@ import { RideService } from './ride.service';
     VehicleModule,
     RideStatusModule,
     ParticipantStatusModule,
-    PaymentMethodModule,
   ],
   controllers: [PublicRideController, RideController],
   providers: [RideService, RideRepository],
