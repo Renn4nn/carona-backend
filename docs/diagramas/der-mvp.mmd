@@ -1,0 +1,155 @@
+erDiagram
+    ROLE ||--o{ USER : "possui"
+    USER ||--o| STUDENT_PROFILE : "possui"
+    UNIVERSITY ||--o{ COURSE : "oferece"
+    COURSE ||--o{ STUDENT_PROFILE : "é cursado por"
+    USER ||--o{ VEHICLE : "possui"
+    USER ||--o{ RIDE : "dirige"
+    VEHICLE ||--o{ RIDE : "é utilizado em"
+    RIDE_STATUS ||--o{ RIDE : "classifica"
+    USER ||--o{ RIDE_PARTICIPANT : "participa"
+    RIDE ||--o{ RIDE_PARTICIPANT : "recebe"
+    PARTICIPANT_STATUS ||--o{ RIDE_PARTICIPANT : "classifica"
+
+    ROLE {
+        String id PK "UUID"
+        String code UK
+        String name
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    USER {
+        String id PK "UUID"
+        String login UK
+        String password
+        String roleId FK
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    UNIVERSITY {
+        String id PK "UUID"
+        String name "UK: name + city + state"
+        String city "UK: name + city + state"
+        String state "UK: name + city + state"
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    COURSE {
+        String id PK "UUID"
+        String universityId FK "UK: universityId + name"
+        String name "UK: universityId + name"
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    STUDENT_PROFILE {
+        String id PK "UUID"
+        String userId FK,UK
+        String courseId FK
+        String name
+        String registration
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    VEHICLE {
+        String id PK "UUID"
+        String ownerId FK
+        String brand
+        String model
+        String color
+        String plate UK
+        Int year
+        Int passengerCapacity
+        Boolean active
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    RIDE_STATUS {
+        String id PK "UUID"
+        String code UK
+        String name
+        String description "nullable"
+        Boolean active
+        Int displayOrder
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    PARTICIPANT_STATUS {
+        String id PK "UUID"
+        String code UK
+        String name
+        String description "nullable"
+        Boolean active
+        Int displayOrder
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    PAYMENT_METHOD {
+        String id PK "UUID"
+        String code UK
+        String name
+        String description "nullable"
+        Boolean active
+        Int displayOrder
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    RIDE {
+        String id PK "UUID"
+        String driverId FK
+        String vehicleId FK
+        String statusId FK
+        String originAddress
+        Decimal originLatitude "nullable, Decimal(10,7)"
+        Decimal originLongitude "nullable, Decimal(10,7)"
+        String destinationAddress
+        Decimal destinationLatitude "nullable, Decimal(10,7)"
+        Decimal destinationLongitude "nullable, Decimal(10,7)"
+        DateTime departureAt "Timestamptz(3)"
+        DateTime estimatedArrivalAt "nullable, Timestamptz(3)"
+        Int totalSeats
+        Int availableSeats
+        String notes "nullable"
+        DateTime startedAt "nullable, Timestamptz(3)"
+        DateTime completedAt "nullable, Timestamptz(3)"
+        DateTime canceledAt "nullable, Timestamptz(3)"
+        String cancellationReason "nullable"
+        DateTime createdAt
+        DateTime updatedAt
+    }
+
+    RIDE_PARTICIPANT {
+        String id PK "UUID"
+        String rideId FK "UK: rideId + userId"
+        String userId FK "UK: rideId + userId"
+        String statusId FK
+        String message "nullable"
+        String dropoffAddress "nullable"
+        Decimal dropoffLatitude "nullable, Decimal(10,7)"
+        Decimal dropoffLongitude "nullable, Decimal(10,7)"
+        Int distanceMeters "nullable"
+        Decimal rideAmount "nullable, Decimal(10,2)"
+        Decimal platformFee "nullable, Decimal(10,2)"
+        Decimal totalAmount "nullable, Decimal(10,2)"
+        DateTime priceCalculatedAt "nullable, Timestamptz(3)"
+        DateTime requestedAt "Timestamptz(3)"
+        DateTime respondedAt "nullable, Timestamptz(3)"
+        DateTime canceledAt "nullable, Timestamptz(3)"
+        DateTime completedAt "nullable, Timestamptz(3)"
+        String cancellationReason "nullable"
+        DateTime createdAt
+        DateTime updatedAt
+    }
