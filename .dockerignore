@@ -1,0 +1,16 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+node_modules
+dist
+generated
+coverage
+logs
+*.log
+*.tsbuildinfo
+compose.env
+compose*.yaml
+README.md
+AGENT.md

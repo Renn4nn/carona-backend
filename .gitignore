@@ -43,6 +43,7 @@ lerna-debug.log*
 .env.local
 .env*
 !.env.example
+compose.env
 
 # temp directory
 .temp

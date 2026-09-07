@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval",
+    "watchDirectory": "fixedPollingInterval"
+  }
+}
