@@ -6,7 +6,7 @@ irmãs.
 
 ## Preparação
 
-Na pasta `carona-backend`, copie `compose.env.example` para `compose.env` e
+Na pasta `carona-backend`, copie `.env.example` para `.env` e
 altere os segredos locais se o arquivo for compartilhado entre máquinas.
 Gere chaves novas no Geoapify: `GEOAPIFY_MAP_TILES_KEY` deve ter apenas acesso
 a Map Tiles e `GEOAPIFY_SERVER_KEY` deve ficar restrita ao backend para
@@ -16,29 +16,29 @@ revogada.
 No PowerShell:
 
 ```powershell
-Copy-Item compose.env.example compose.env
+Copy-Item .env.example .env
 ```
 
 ## Comandos
 
 ```bash
 # Construir as imagens e iniciar toda a aplicação
-docker compose --env-file compose.env up --build
+docker compose up --build
 
 # Iniciar em segundo plano
-docker compose --env-file compose.env up --build -d
+docker compose up --build -d
 
 # Acompanhar frontend e backend
-docker compose --env-file compose.env logs -f backend frontend
+docker compose logs -f backend frontend
 
 # Executar o seed quando necessário
-docker compose --env-file compose.env exec backend pnpm exec prisma db seed
+docker compose exec backend pnpm exec prisma db seed
 
 # Parar os containers
-docker compose --env-file compose.env down
+docker compose down
 
 # Parar e apagar também o banco de dados local
-docker compose --env-file compose.env down -v
+docker compose down -v
 ```
 
 O frontend fica disponível em <http://localhost:3001>, o backend e o Swagger
@@ -49,9 +49,9 @@ Alterações no código possuem hot reload. Depois de alterar `package.json` ou 
 lockfile de um projeto, reconstrua sua imagem:
 
 ```bash
-docker compose --env-file compose.env build backend
-docker compose --env-file compose.env build frontend
-docker compose --env-file compose.env up
+docker compose build backend
+docker compose build frontend
+docker compose up
 ```
 
 O backend aplica as migrations existentes ao iniciar. A criação de novas
