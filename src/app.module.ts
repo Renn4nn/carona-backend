@@ -21,6 +21,7 @@ import { ParticipantStatusModule } from './module/participant-status/participant
 import { PaymentMethodModule } from './module/payment-method/payment-method.module';
 import { RideModule } from './module/ride/ride.module';
 import { RideParticipantModule } from './module/ride-participant/ride-participant.module';
+import { GeoModule } from './module/geo/geo.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { RideParticipantModule } from './module/ride-participant/ride-participan
     PaymentMethodModule,
     RideModule,
     RideParticipantModule,
+    GeoModule,
   ],
   providers: [
     {

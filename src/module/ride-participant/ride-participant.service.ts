@@ -80,6 +80,10 @@ export class RideParticipantService {
     return (await this.repository.findByRide(rideId)).map(mapRideParticipant);
   }
 
+  getExistingForRoute(rideId: string) {
+    return this.rideService.getExistingForParticipant(rideId);
+  }
+
   async findMine(
     userId: string,
     query: RideParticipationQuerySchema,

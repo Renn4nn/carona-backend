@@ -17,6 +17,8 @@ import {
   CancelRideDto,
   CreateRideDto,
   MineRideQueryDto,
+  NearbyRideQueryDto,
+  type NearbyRideSchema,
   type PublicRideSchema,
   RideQueryDto,
   type RideSchema,
@@ -56,6 +58,14 @@ export class RideController {
     @Query() query: RideQueryDto,
   ): Promise<ApiSuccessResponse<CursorPage<RideSchema>>> {
     return { data: await this.service.findMany(user.userId, query) };
+  }
+
+  @Get('nearby')
+  async findNearby(
+    @CurrentUser() user: RequestUser,
+    @Query() query: NearbyRideQueryDto,
+  ): Promise<ApiSuccessResponse<NearbyRideSchema[]>> {
+    return { data: await this.service.findNearby(user.userId, query) };
   }
 
   @Get('mine')

@@ -83,6 +83,12 @@ export const mineRideQuerySchema = rideQuerySchema
     role: z.enum(['driver', 'passenger']),
   });
 
+export const nearbyRideQuerySchema = z.strictObject({
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+  radiusKm: z.coerce.number().min(0.5).max(25).default(5),
+});
+
 const rideBaseResponseSchema = z.strictObject({
   id: z.uuid(),
   status: rideStatusSchema,
@@ -98,6 +104,16 @@ const rideBaseResponseSchema = z.strictObject({
 });
 
 export const publicRideSchema = rideBaseResponseSchema;
+
+export const nearbyRideSchema = z.strictObject({
+  id: z.uuid(),
+  driver: z.strictObject({ id: z.uuid(), login: z.string() }),
+  departureAt: isoDateTimeSchema('Data de partida inválida'),
+  availableSeats: z.number().int(),
+  originLatitude: z.number(),
+  originLongitude: z.number(),
+  distanceMeters: z.number().int(),
+});
 
 export const rideSchema = rideBaseResponseSchema.extend({
   driver: z.strictObject({ id: z.uuid(), login: z.string() }),
@@ -126,7 +142,9 @@ export type UpdateRideSchema = z.infer<typeof updateRideSchema>;
 export type CancelRideSchema = z.infer<typeof cancelRideSchema>;
 export type RideQuerySchema = z.infer<typeof rideQuerySchema>;
 export type MineRideQuerySchema = z.infer<typeof mineRideQuerySchema>;
+export type NearbyRideQuerySchema = z.infer<typeof nearbyRideQuerySchema>;
 export type PublicRideSchema = z.infer<typeof publicRideSchema>;
+export type NearbyRideSchema = z.infer<typeof nearbyRideSchema>;
 export type RideSchema = z.infer<typeof rideSchema>;
 
 export class CreateRideDto extends createZodDto(createRideSchema) {}
@@ -134,5 +152,6 @@ export class UpdateRideDto extends createZodDto(updateRideSchema) {}
 export class CancelRideDto extends createZodDto(cancelRideSchema) {}
 export class RideQueryDto extends createZodDto(rideQuerySchema) {}
 export class MineRideQueryDto extends createZodDto(mineRideQuerySchema) {}
+export class NearbyRideQueryDto extends createZodDto(nearbyRideQuerySchema) {}
 export class PublicRideDto extends createZodDto(publicRideSchema) {}
 export class RideDto extends createZodDto(rideSchema) {}

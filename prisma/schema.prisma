@@ -173,6 +173,7 @@ model Ride {
   @@index([statusId, departureAt])
   @@index([driverId, departureAt])
   @@index([vehicleId, departureAt])
+  @@index([originLatitude, originLongitude])
 }
 
 model RideParticipant {

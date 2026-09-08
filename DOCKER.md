@@ -8,6 +8,10 @@ irmãs.
 
 Na pasta `carona-backend`, copie `compose.env.example` para `compose.env` e
 altere os segredos locais se o arquivo for compartilhado entre máquinas.
+Gere chaves novas no Geoapify: `GEOAPIFY_MAP_TILES_KEY` deve ter apenas acesso
+a Map Tiles e `GEOAPIFY_SERVER_KEY` deve ficar restrita ao backend para
+Autocomplete e Routing. A chave enviada em mensagens ou commits deve ser
+revogada.
 
 No PowerShell:
 

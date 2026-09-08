@@ -27,7 +27,10 @@ export function mapPublicRide(ride: PublicRideRecord): PublicRideSchema {
   };
 }
 
-export function mapRide(ride: RideDetailRecord): RideSchema {
+export function mapRide(
+  ride: RideDetailRecord,
+  includeExactLocations = true,
+): RideSchema {
   return {
     ...mapPublicRide(ride),
     driver: ride.driver,
@@ -38,10 +41,18 @@ export function mapRide(ride: RideDetailRecord): RideSchema {
       color: ride.vehicle.color,
       year: ride.vehicle.year,
     },
-    originLatitude: ride.originLatitude?.toNumber() ?? null,
-    originLongitude: ride.originLongitude?.toNumber() ?? null,
-    destinationLatitude: ride.destinationLatitude?.toNumber() ?? null,
-    destinationLongitude: ride.destinationLongitude?.toNumber() ?? null,
+    originLatitude: includeExactLocations
+      ? (ride.originLatitude?.toNumber() ?? null)
+      : null,
+    originLongitude: includeExactLocations
+      ? (ride.originLongitude?.toNumber() ?? null)
+      : null,
+    destinationLatitude: includeExactLocations
+      ? (ride.destinationLatitude?.toNumber() ?? null)
+      : null,
+    destinationLongitude: includeExactLocations
+      ? (ride.destinationLongitude?.toNumber() ?? null)
+      : null,
     notes: ride.notes,
     startedAt: ride.startedAt?.toISOString() ?? null,
     completedAt: ride.completedAt?.toISOString() ?? null,

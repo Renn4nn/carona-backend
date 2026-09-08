@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseUUIDPipe,
@@ -22,11 +24,60 @@ import {
 import type { ApiSuccessResponse, CursorPage } from 'src/utils/types/api/api';
 import type { RequestUser } from 'src/utils/types/auth/auth';
 import { RideParticipantService } from './ride-participant.service';
+import { RideParticipantRepository } from './ride-participant.repository';
+import { GeoService } from 'src/module/geo/geo.service';
+import { PARTICIPANT_STATUS } from 'src/module/ride/ride.constants';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class RideParticipantController {
-  constructor(private readonly service: RideParticipantService) {}
+  constructor(
+    private readonly service: RideParticipantService,
+    private readonly repository: RideParticipantRepository,
+    private readonly geoService: GeoService,
+  ) {}
+
+  @Get('rides/:rideId/route')
+  async route(
+    @CurrentUser() user: RequestUser,
+    @Param('rideId', ParseUUIDPipe) rideId: string,
+  ) {
+    const ride = await this.service.getExistingForRoute(rideId);
+    const participant =
+      ride.driverId === user.userId
+        ? null
+        : await this.repository.findByRideAndUser(rideId, user.userId);
+    if (
+      ride.driverId !== user.userId &&
+      participant?.status.code !== PARTICIPANT_STATUS.ACCEPTED
+    ) {
+      throw new ForbiddenException(
+        'A rota exata só está disponível para participantes aprovados.',
+      );
+    }
+    if (
+      ride.originLatitude === null ||
+      ride.originLongitude === null ||
+      ride.destinationLatitude === null ||
+      ride.destinationLongitude === null
+    ) {
+      throw new BadRequestException(
+        'Esta carona ainda não possui coordenadas suficientes para calcular a rota.',
+      );
+    }
+    return {
+      data: await this.geoService.route(
+        {
+          latitude: ride.originLatitude.toNumber(),
+          longitude: ride.originLongitude.toNumber(),
+        },
+        {
+          latitude: ride.destinationLatitude.toNumber(),
+          longitude: ride.destinationLongitude.toNumber(),
+        },
+      ),
+    };
+  }
 
   @Post('rides/:rideId/participants')
   async request(

@@ -13,6 +13,8 @@ import type {
   CancelRideSchema,
   CreateRideSchema,
   MineRideQuerySchema,
+  NearbyRideQuerySchema,
+  NearbyRideSchema,
   PublicRideSchema,
   RideQuerySchema,
   RideSchema,
@@ -65,7 +67,26 @@ export class RideService {
     await this.userService.assertActive(userId);
     this.validateQueryRange(query);
     const records = await this.repository.findMany(query);
-    return this.mapPage(records, query.limit, mapRide);
+    return this.mapPage(records, query.limit, (record) =>
+      mapRide(record, false),
+    );
+  }
+
+  async findNearby(
+    userId: string,
+    query: NearbyRideQuerySchema,
+  ): Promise<NearbyRideSchema[]> {
+    await this.userService.assertActive(userId);
+    const records = await this.repository.findNearby(query);
+    return records.map((record) => ({
+      id: record.id,
+      driver: { id: record.driverId, login: record.login },
+      departureAt: record.departureAt.toISOString(),
+      availableSeats: record.availableSeats,
+      originLatitude: record.originLatitude,
+      originLongitude: record.originLongitude,
+      distanceMeters: record.distanceMeters,
+    }));
   }
 
   async findMine(
@@ -75,12 +96,19 @@ export class RideService {
     await this.userService.assertActive(userId);
     this.validateQueryRange(query);
     const records = await this.repository.findMine(userId, query);
-    return this.mapPage(records, query.limit, mapRide);
+    return this.mapPage(records, query.limit, (record) =>
+      mapRide(record, false),
+    );
   }
 
   async findById(userId: string, id: string): Promise<RideSchema> {
     await this.userService.assertActive(userId);
-    return mapRide(await this.getExisting(id));
+    const ride = await this.getExisting(id);
+    const canViewExact =
+      ride.driverId === userId ||
+      (await this.repository.findParticipantStatus(id, userId))?.status.code ===
+        PARTICIPANT_STATUS.ACCEPTED;
+    return mapRide(ride, canViewExact);
   }
 
   async create(userId: string, data: CreateRideSchema): Promise<RideSchema> {

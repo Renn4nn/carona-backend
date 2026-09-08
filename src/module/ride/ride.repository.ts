@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Prisma, PrismaClient } from 'generated/prisma/client';
+import { Prisma, type PrismaClient } from 'generated/prisma/client';
 import type {
   CreateRideSchema,
+  NearbyRideQuerySchema,
   MineRideQuerySchema,
   RideQuerySchema,
   UpdateRideSchema,
@@ -59,6 +60,49 @@ export class RideRepository {
     });
   }
 
+  findNearby(query: NearbyRideQuerySchema) {
+    const radiusMeters = query.radiusKm * 1000;
+    const latDelta = query.radiusKm / 111.32;
+    const lonDelta =
+      query.radiusKm /
+      (111.32 * Math.max(Math.cos((query.latitude * Math.PI) / 180), 0.1));
+    return this.prisma.$queryRaw<
+      Array<{
+        id: string;
+        driverId: string;
+        login: string;
+        departureAt: Date;
+        availableSeats: number;
+        originLatitude: number;
+        originLongitude: number;
+        distanceMeters: number;
+      }>
+    >(Prisma.sql`
+      WITH nearby AS (
+      SELECT r.id, r."driverId", u.login, r."departureAt", r."availableSeats",
+        ROUND(r."originLatitude"::numeric, 3)::double precision AS "originLatitude",
+        ROUND(r."originLongitude"::numeric, 3)::double precision AS "originLongitude",
+        ROUND((6371000 * acos(LEAST(1, GREATEST(-1,
+          sin(radians(${query.latitude})) * sin(radians(r."originLatitude"::double precision)) +
+          cos(radians(${query.latitude})) * cos(radians(r."originLatitude"::double precision)) *
+          cos(radians(r."originLongitude"::double precision) - radians(${query.longitude}))
+        ))))::numeric)::integer AS "distanceMeters"
+      FROM "Ride" r
+      JOIN "User" u ON u.id = r."driverId"
+      JOIN "RideStatus" rs ON rs.id = r."statusId"
+      WHERE rs.code = 'OPEN' AND rs.active = true AND u.active = true
+        AND r."departureAt" >= NOW() AND r."availableSeats" > 0
+        AND r."originLatitude" IS NOT NULL AND r."originLongitude" IS NOT NULL
+        AND r."originLatitude" BETWEEN ${query.latitude - latDelta} AND ${query.latitude + latDelta}
+        AND r."originLongitude" BETWEEN ${query.longitude - lonDelta} AND ${query.longitude + lonDelta}
+      )
+      SELECT * FROM nearby
+      WHERE "distanceMeters" <= ${radiusMeters}
+      ORDER BY "distanceMeters" ASC, id ASC
+      LIMIT 50
+    `);
+  }
+
   findMine(userId: string, query: MineRideQuerySchema) {
     const relationWhere: Prisma.RideWhereInput =
       query.role === 'driver'
@@ -94,6 +138,13 @@ export class RideRepository {
     return this.prisma.ride.findUnique({
       where: { id },
       select: RIDE_DETAIL_SELECT,
+    });
+  }
+
+  findParticipantStatus(rideId: string, userId: string) {
+    return this.prisma.rideParticipant.findUnique({
+      where: { rideId_userId: { rideId, userId } },
+      select: { status: { select: { code: true } } },
     });
   }
 

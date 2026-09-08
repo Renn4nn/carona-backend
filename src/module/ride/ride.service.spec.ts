@@ -12,6 +12,7 @@ describe('RideService', () => {
   const repository = {
     create: jest.fn(),
     findById: jest.fn(),
+    findParticipantStatus: jest.fn(),
     countAccepted: jest.fn(),
     update: jest.fn(),
   };

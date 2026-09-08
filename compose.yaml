@@ -40,6 +40,7 @@ services:
       USER_PASSWORD: ${USER_PASSWORD:-user.carona}
       STUDENT_NAME: ${STUDENT_NAME:-Usuario Carona}
       ALLOWED_ORIGINS: http://localhost:3001
+      GEOAPIFY_SERVER_KEY: ${GEOAPIFY_SERVER_KEY:-}
       CHOKIDAR_USEPOLLING: "true"
     command:
       ["pnpm", "exec", "nest", "start", "--watch", "--path", "tsconfig.docker.json"]
@@ -74,6 +75,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       API_BASE_URL: http://backend:3000/api
+      NEXT_PUBLIC_GEOAPIFY_API_KEY: ${GEOAPIFY_MAP_TILES_KEY:-}
       AUTH_COOKIE_SECURE: "false"
       WATCHPACK_POLLING: "true"
     ports:
