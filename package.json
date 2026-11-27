@@ -19,6 +19,7 @@
     "db:generate": "dotenv -e ./.env -e ./.env.production -e ./.env.development -- prisma generate",
     "db:migrate": "dotenv -e ./.env -e ./.env.production -e ./.env.development -- prisma migrate dev",
     "db:seed:dev": "dotenv -e ./.env -e ./.env.production -e ./.env.development -- prisma db seed",
+    "db:seed:demo": "tsx prisma/seed/demo.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

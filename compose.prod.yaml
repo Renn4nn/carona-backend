@@ -1,0 +1,16 @@
+# Frontend em modo produção (next build + node server.js), para demos e gravações.
+# Uso (na pasta carona-backend):
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+# Voltar ao modo desenvolvimento:
+#   docker compose up -d --build frontend
+services:
+  frontend:
+    build:
+      context: ../carona-frontend
+      target: production
+      args:
+        NEXT_PUBLIC_GEOAPIFY_API_KEY: ${GEOAPIFY_MAP_TILES_KEY:-}
+    environment:
+      NODE_ENV: production
+      WATCHPACK_POLLING: !reset null
+    volumes: !reset []
