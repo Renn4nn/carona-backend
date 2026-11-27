@@ -1,6 +1,7 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import z from 'zod';
+import { DEFAULT_GEO_REGION, type GeoRegion } from './geo.constants';
 
 const autocompleteResponseSchema = z.object({
   results: z.array(
@@ -31,12 +32,15 @@ export class GeoService {
   async autocomplete(query: string) {
     const key = this.config.get<string>('GEOAPIFY_SERVER_KEY');
     if (!key) throw new BadGatewayException('Geocodificação não configurada.');
+    const region = this.region();
     const params = new URLSearchParams({
       text: query,
       format: 'json',
       limit: '5',
-      filter: 'countrycode:br',
-      bias: 'proximity:-51.1628,-23.3103',
+      lang: 'pt',
+      // O Geoapify espera longitude antes da latitude; raio em metros.
+      filter: `circle:${region.longitude},${region.latitude},${region.radiusKm * 1000}|countrycode:${region.countryCode}`,
+      bias: `proximity:${region.longitude},${region.latitude}`,
       apiKey: key,
     });
     const result = await this.getJson(
@@ -80,6 +84,21 @@ export class GeoService {
         typeof properties.distance === 'number' ? properties.distance : null,
       durationSeconds:
         typeof properties.time === 'number' ? properties.time : null,
+    };
+  }
+
+  private region(): GeoRegion {
+    const number = (name: string, fallback: number) => {
+      const value = Number(this.config.get<string>(name));
+      return Number.isFinite(value) && value !== 0 ? value : fallback;
+    };
+    return {
+      latitude: number('GEO_REGION_LATITUDE', DEFAULT_GEO_REGION.latitude),
+      longitude: number('GEO_REGION_LONGITUDE', DEFAULT_GEO_REGION.longitude),
+      radiusKm: number('GEO_REGION_RADIUS_KM', DEFAULT_GEO_REGION.radiusKm),
+      countryCode:
+        this.config.get<string>('GEO_COUNTRY_CODE') ||
+        DEFAULT_GEO_REGION.countryCode,
     };
   }
 
